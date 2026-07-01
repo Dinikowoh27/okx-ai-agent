@@ -121,21 +121,31 @@ async def rugpull_score(req: Request):
     # Simple heuristic score 0-100 (lower = safer)
     score = 0
     reasons = []
-    if not security.get("ok"):
+    sec_data = None
+    if security.get("ok") and isinstance(security.get("data"), list) and security["data"]:
+        sec_data = security["data"][0]
+    elif security.get("ok") and isinstance(security.get("data"), dict):
+        sec_data = security["data"]
+
+    if not sec_data:
         score += 30
         reasons.append("security scan unavailable")
     else:
-        data = security.get("data", {})
-        if data.get("is_honeypot"):
+        if sec_data.get("isHoneypot"):
             score += 50
             reasons.append("honeypot detected")
-        if data.get("buy_tax", 0) > 5 or data.get("sell_tax", 0) > 5:
-            score += 25
-            reasons.append("high tax")
-        if data.get("is_mintable"):
+        try:
+            buy_tax = float(sec_data.get("buyTaxes", "0") or "0")
+            sell_tax = float(sec_data.get("sellTaxes", "0") or "0")
+            if buy_tax > 5 or sell_tax > 5:
+                score += 25
+                reasons.append("high tax")
+        except (ValueError, TypeError):
+            pass
+        if sec_data.get("isMintable"):
             score += 20
             reasons.append("mintable supply")
-        if data.get("is_ownership_renounced") is False:
+        if sec_data.get("isNotRenounced"):
             score += 15
             reasons.append("ownership not renounced")
 
