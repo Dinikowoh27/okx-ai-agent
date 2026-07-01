@@ -26,7 +26,7 @@ okx-ai-agent/
 ├── server.py            # FastAPI A2MCP server
 ├── services.json        # service catalog for ASP registration
 ├── scripts/
-│   ├── register-asp.sh  # register/update ASP identity
+│   ├── register-asp.py  # register/update ASP identity
 │   └── test-local.sh    # curl smoke tests
 └── skills/
     └── okx-ai-service/
@@ -43,6 +43,7 @@ okx-ai-agent/
    ```
 
 2. Make sure `.env` has `OKX_API_KEY`, `OKX_SECRET_KEY`, `OKX_PASSPHRASE`.
+   Optional: set `ONCHAINOS_BIN` if `onchainos` is not in `~/.local/bin`.
 
 3. Run local server:
    ```bash
@@ -59,7 +60,7 @@ okx-ai-agent/
 ## Register ASP
 
 ```bash
-bash scripts/register-asp.sh
+python scripts/register-asp.py
 ```
 
 This calls `onchainos agent create --role asp` using `services.json` and a local avatar image.

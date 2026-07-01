@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse
 
 load_dotenv()
 
-ONCHAINOS = os.path.expanduser("~/.local/bin/onchainos")
+ONCHAINOS = os.path.expanduser(os.getenv("ONCHAINOS_BIN", "~/.local/bin/onchainos"))
 HOST = os.getenv("OKX_AI_HOST", "0.0.0.0")
 PORT = int(os.getenv("OKX_AI_PORT", "8000"))
 
@@ -26,7 +26,7 @@ PORT = int(os.getenv("OKX_AI_PORT", "8000"))
 def run(cmd: list[str], timeout: int = 60) -> dict[str, Any]:
     """Run an onchainos command and return its JSON output."""
     env = os.environ.copy()
-    env["PATH"] = os.path.expanduser("~/.local/bin") + ":" + env.get("PATH", "")
+    env["PATH"] = os.path.expanduser(os.getenv("ONCHAINOS_DIR", "~/.local/bin")) + ":" + env.get("PATH", "")
     try:
         result = subprocess.run(
             [ONCHAINOS] + cmd,

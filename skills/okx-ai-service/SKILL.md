@@ -22,7 +22,7 @@ Internal skill untuk menjalankan layanan Eida di OKX.AI marketplace.
 FastAPI server berjalan di `okx-ai-agent/server.py`.
 
 ```bash
-cd /home/ubuntu/okx-ai-agent
+cd "$OKX_AI_DIR"
 source .venv/bin/activate
 python server.py
 ```
@@ -45,7 +45,7 @@ python server.py
 4. Jalankan:
 
 ```bash
-cd /home/ubuntu/okx-ai-agent
+cd "$OKX_AI_DIR"
 source .venv/bin/activate
 python scripts/register-asp.py
 ```

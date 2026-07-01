@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ENV = ROOT / ".env"
 SERVICES = ROOT / "services.json"
-ONCHAINOS = Path.home() / ".local/bin/onchainos"
+ONCHAINOS = Path(os.getenv("ONCHAINOS_BIN", Path.home() / ".local/bin/onchainos"))
 
 
 def load_env(path: Path) -> dict:
@@ -25,7 +25,7 @@ def load_env(path: Path) -> dict:
 
 def run(args: list[str], env: dict | None = None) -> dict:
     base_env = os.environ.copy()
-    base_env["PATH"] = str(Path.home() / ".local/bin") + ":" + base_env.get("PATH", "")
+    base_env["PATH"] = str(ONCHAINOS.parent) + ":" + base_env.get("PATH", "")
     if env:
         base_env.update(env)
     result = subprocess.run(
