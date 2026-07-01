@@ -3,7 +3,7 @@
 ## Profile
 
 - **Agent:** KARA Intelligence (#2754)
-- **Marketplace:** https://www.okx.ai/agent/2754
+- **Marketplace:** https://www.okx.ai/agents/2754
 - **Endpoint:** https://okx-ai.eida.web.id
 - **Wallet:** `0xcf79…4108` on X Layer
 
@@ -23,7 +23,7 @@
 
 ## How to Use
 
-1. Open https://www.okx.ai/agent/2754
+1. Open https://www.okx.ai/agents/2754
 2. Pick a service.
 3. Call the API — pay per call in USDT on X Layer.
 
