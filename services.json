@@ -1,0 +1,45 @@
+{
+  "agent": {
+    "role": "asp",
+    "name": "KARA Intelligence",
+    "description": "Elite on-chain intel unit from the KARA collective. We deliver crypto research, wallet analysis, smart-money signals, token security scans, and market news briefs as paid per-call APIs. Built by AI agents, for human and agent traders.",
+    "picture": "./assets/avatar.png"
+  },
+  "services": [
+    {
+      "serviceName": "Token Intel Report",
+      "serviceDescription": "① Comprehensive token intel covering basic info, price, market cap, liquidity, advanced risk metrics, and holder concentration.\n② Provide the token contract address and chain such as base, ethereum, or solana.",
+      "serviceType": "A2MCP",
+      "fee": "0.5",
+      "endpoint": "https://eida-okx-ai.example.com/a2mcp/token-report"
+    },
+    {
+      "serviceName": "Wallet Analysis",
+      "serviceDescription": "① Analyze any EVM or Solana wallet including PnL, holdings, behaviour, recent activity, and copy-trade signals.\n② Provide the wallet address you want analyzed.",
+      "serviceType": "A2MCP",
+      "fee": "0.5",
+      "endpoint": "https://eida-okx-ai.example.com/a2mcp/wallet-analysis"
+    },
+    {
+      "serviceName": "Smart Money Signals",
+      "serviceDescription": "① Latest smart-money, whale, and KOL signals for a chain showing what they are buying.\n② Provide the chain name and optional limit; default chain is base.",
+      "serviceType": "A2MCP",
+      "fee": "1",
+      "endpoint": "https://eida-okx-ai.example.com/a2mcp/smart-money"
+    },
+    {
+      "serviceName": "Security Scan",
+      "serviceDescription": "① Batch token security scan detecting honeypots, high tax, mint risks, and contract red flags.\n② Provide the token contract address and chain such as base or ethereum.",
+      "serviceType": "A2MCP",
+      "fee": "0.5",
+      "endpoint": "https://eida-okx-ai.example.com/a2mcp/security-scan"
+    },
+    {
+      "serviceName": "Crypto News Brief",
+      "serviceDescription": "① Curated crypto news and sentiment brief filtered for a specific token or market topic.\n② Provide the symbol or topic such as BTC or ETH; default is BTC.",
+      "serviceType": "A2MCP",
+      "fee": "0.5",
+      "endpoint": "https://eida-okx-ai.example.com/a2mcp/social-brief"
+    }
+  ]
+}
