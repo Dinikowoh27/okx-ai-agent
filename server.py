@@ -106,6 +106,74 @@ async def social_brief(req: Request):
     return run(["social", "news-by-symbol", "--token-symbols", symbol])
 
 
+@app.post("/a2mcp/rugpull-score")
+async def rugpull_score(req: Request):
+    """Combined rugpull risk score from token scan + token report."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    address = body.get("address", "")
+    if not address:
+        return JSONResponse({"ok": False, "error": "address required"}, status_code=400)
+
+    security = run(["security", "token-scan", "--tokens", f"{chain}:{address}"])
+    report = run(["token", "report", "--address", address, "--chain", chain])
+
+    # Simple heuristic score 0-100 (lower = safer)
+    score = 0
+    reasons = []
+    if not security.get("ok"):
+        score += 30
+        reasons.append("security scan unavailable")
+    else:
+        data = security.get("data", {})
+        if data.get("is_honeypot"):
+            score += 50
+            reasons.append("honeypot detected")
+        if data.get("buy_tax", 0) > 5 or data.get("sell_tax", 0) > 5:
+            score += 25
+            reasons.append("high tax")
+        if data.get("is_mintable"):
+            score += 20
+            reasons.append("mintable supply")
+        if data.get("is_ownership_renounced") is False:
+            score += 15
+            reasons.append("ownership not renounced")
+
+    if not report.get("ok"):
+        score += 10
+        reasons.append("token report incomplete")
+
+    verdict = "BUY" if score <= 20 else "SKIP" if score <= 50 else "BLOCK"
+    return {
+        "ok": True,
+        "score": min(score, 100),
+        "verdict": verdict,
+        "reasons": reasons,
+        "security": security,
+        "report": report,
+    }
+
+
+@app.post("/a2mcp/kara-intel-pack")
+async def kara_intel_pack(req: Request):
+    """Bundle: token report + wallet analysis + security scan."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    token_address = body.get("token_address", "")
+    wallet_address = body.get("wallet_address", "")
+    if not token_address or not wallet_address:
+        return JSONResponse(
+            {"ok": False, "error": "token_address and wallet_address required"},
+            status_code=400,
+        )
+    return {
+        "ok": True,
+        "token_report": run(["token", "report", "--address", token_address, "--chain", chain]),
+        "wallet_analysis": run(["workflow", "wallet-analysis", "--address", wallet_address]),
+        "security_scan": run(["security", "token-scan", "--tokens", f"{chain}:{token_address}"]),
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 

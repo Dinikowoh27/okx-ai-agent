@@ -40,6 +40,20 @@
       "serviceType": "A2MCP",
       "fee": "0.5",
       "endpoint": "https://okx-ai.eida.web.id/a2mcp/social-brief"
+    },
+    {
+      "serviceName": "Rugpull Risk Score",
+      "serviceDescription": "① Combined rugpull risk score (0–100) from contract security scan + token report.\n② Provide the token contract address and chain; returns a BUY / SKIP / BLOCK verdict.",
+      "serviceType": "A2MCP",
+      "fee": "0.5",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/rugpull-score"
+    },
+    {
+      "serviceName": "KARA Intel Pack",
+      "serviceDescription": "① Bundle: token report + wallet analysis + security scan in one call.\n② Provide chain, token_address, and wallet_address.",
+      "serviceType": "A2MCP",
+      "fee": "1",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/kara-intel-pack"
     }
   ]
 }
