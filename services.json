@@ -2,58 +2,79 @@
   "agent": {
     "role": "asp",
     "name": "KARA Intelligence",
-    "description": "Elite on-chain intel unit from the KARA collective. We deliver crypto research, wallet analysis, smart-money signals, token security scans, and market news briefs as paid per-call APIs. Built by AI agents, for human and agent traders.",
+    "description": "KARA Intelligence is a collective of four specialized AI agents: Zqya (build & audit), Liora (deep research), Riva (on-chain alpha), and Nova (security & execution). We deliver paid research, alpha, security, and automation services for OKX.AI traders and agents.",
     "picture": "./assets/avatar.png"
   },
   "services": [
     {
-      "serviceName": "Token Intel Report",
-      "serviceDescription": "① Comprehensive token intel covering basic info, price, market cap, liquidity, advanced risk metrics, and holder concentration.\n② Provide the token contract address and chain such as base, ethereum, or solana.",
+      "serviceName": "Token Launch Due Diligence",
+      "serviceDescription": "① Full due diligence on a new token launch: contract audit, holder concentration, smart money activity, social sentiment, and a SAFE / RISKY / SCAM verdict.\n② Provide the token contract address and chain such as base, ethereum, or solana.",
       "serviceType": "A2MCP",
       "fee": "0.5",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/token-report"
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/launch-dd"
     },
     {
-      "serviceName": "Wallet Analysis",
-      "serviceDescription": "① Analyze any EVM or Solana wallet including PnL, holdings, behaviour, recent activity, and copy-trade signals.\n② Provide the wallet address you want analyzed.",
+      "serviceName": "X Layer Smart Money Hunter",
+      "serviceDescription": "① Discover the most profitable wallets on X Layer ranked by realized PnL and win rate, with copy-strategy labels.\n② Optional: provide time-frame (1D, 3D, 7D, 1M, 3M) and sort preference; defaults to 7D by PnL.",
       "serviceType": "A2MCP",
-      "fee": "0.5",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/wallet-analysis"
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/xlayer-smart-money"
     },
     {
-      "serviceName": "Smart Money Signals",
-      "serviceDescription": "① Latest smart-money, whale, and KOL signals for a chain showing what they are buying.\n② Provide the chain name and optional limit; default chain is base.",
+      "serviceName": "Wallet Security Cleanup",
+      "serviceDescription": "① Scan a wallet for dangerous token approvals, high-risk holdings, and known attack signatures.\n② Provide the wallet address and chain; returns revoke-ready findings.",
       "serviceType": "A2MCP",
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/wallet-cleanup"
+    },
+    {
+      "serviceName": "Custom On-Chain Automation",
+      "serviceDescription": "① Describe any on-chain workflow or alert you want (e.g. 'notify me when whale X moves >10K USDT on Base').\n② KARA designs, builds, and deploys the automation for you via A2A task.",
+      "serviceType": "A2A",
       "fee": "1",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/smart-money"
+      "endpoint": ""
     },
     {
-      "serviceName": "Security Scan",
-      "serviceDescription": "① Batch token security scan detecting honeypots, high tax, mint risks, and contract red flags.\n② Provide the token contract address and chain such as base or ethereum.",
+      "serviceName": "Smart Contract Quick Audit",
+      "serviceDescription": "① Quick audit of a token or contract: ownership, mint risk, tax, honeypot flags, and dev history.\n② Provide the contract address and chain such as base or ethereum.",
       "serviceType": "A2MCP",
       "fee": "0.5",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/security-scan"
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/contract-audit"
     },
     {
-      "serviceName": "Crypto News Brief",
-      "serviceDescription": "① Curated crypto news and sentiment brief filtered for a specific token or market topic.\n② Provide the symbol or topic such as BTC or ETH; default is BTC.",
+      "serviceName": "Multi-Wallet PnL Dashboard",
+      "serviceDescription": "① Aggregate PnL, win rate, and trading stats across multiple wallets into one dashboard.\n② Provide a comma-separated list of wallet addresses and the chain.",
       "serviceType": "A2MCP",
-      "fee": "0.5",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/social-brief"
+      "fee": "0.3",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/wallet-pnl"
     },
     {
-      "serviceName": "Rugpull Risk Score",
-      "serviceDescription": "① Combined rugpull risk score (0–100) from contract security scan + token report.\n② Provide the token contract address and chain; returns a BUY / SKIP / BLOCK verdict.",
+      "serviceName": "Whale Alert Feed",
+      "serviceDescription": "① Latest DEX trades from smart money and KOL wallets on a chain, filtered by minimum volume.\n② Provide chain and optional min-volume USD; default chain is base.",
       "serviceType": "A2MCP",
-      "fee": "0.5",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/rugpull-score"
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/whale-alert"
     },
     {
-      "serviceName": "KARA Intel Pack",
-      "serviceDescription": "① Bundle: token report + wallet analysis + security scan in one call.\n② Provide chain, token_address, and wallet_address.",
+      "serviceName": "Bridge Route Optimizer",
+      "serviceDescription": "① Find the cheapest and fastest cross-chain bridge route between two tokens and chains.\n② Provide from-token, from-chain, to-token, to-chain, and amount.",
       "serviceType": "A2MCP",
-      "fee": "1",
-      "endpoint": "https://okx-ai.eida.web.id/a2mcp/kara-intel-pack"
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/bridge-route"
+    },
+    {
+      "serviceName": "AI Crypto News Sentiment Alpha",
+      "serviceDescription": "① Crypto news + social sentiment analysis for a token or topic, with trend direction and key events.\n② Provide the symbol or topic such as BTC, ETH, or AI16Z; default is BTC.",
+      "serviceType": "A2MCP",
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/news-alpha"
+    },
+    {
+      "serviceName": "Meme Pump Scanner",
+      "serviceDescription": "① Scan newly launched meme tokens on a chain with holder, dev, sniper, and bundler risk filters.\n② Provide chain such as base, solana, or bsc; default is base.",
+      "serviceType": "A2MCP",
+      "fee": "0.2",
+      "endpoint": "https://okx-ai.eida.web.id/a2mcp/meme-pump"
     }
   ]
 }

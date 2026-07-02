@@ -1,18 +1,23 @@
-# OKX.AI Agent Service — Eida
+# OKX.AI Agent Service — KARA Intelligence
 
-Hermes-powered ASP (Agent Service Provider) for OKX.AI marketplace.
+Hermes-powered ASP (Agent Service Provider) for the OKX.AI marketplace.
 
 ## What it sells
 
-A2MCP pay-per-call services built on top of `onchainos` skills:
+A2MCP pay-per-call services and one A2A custom-automation service, built on top of `onchainos` skills and exposed through a public FastAPI server.
 
-| Service | OnchainOS command | Path | Fee |
+| Service | Path | Fee | Category |
 |---|---|---|---|
-| Token Intel Report | `token report` | `/a2mcp/token-report` | 0.5 USDT |
-| Wallet Analysis | `workflow wallet-analysis` | `/a2mcp/wallet-analysis` | 0.5 USDT |
-| Smart Money Signals | `signal list` | `/a2mcp/smart-money` | 1 USDT |
-| Security Scan | `security token-scan` | `/a2mcp/security-scan` | 0.5 USDT |
-| Crypto News Brief | `social news` | `/a2mcp/social-brief` | 0.5 USDT |
+| Token Launch Due Diligence | `/a2mcp/launch-dd` | 0.5 USDT | Finance Copilot |
+| X Layer Smart Money Hunter | `/a2mcp/xlayer-smart-money` | 0.2 USDT | Finance Copilot |
+| Wallet Security Cleanup | `/a2mcp/wallet-cleanup` | 0.2 USDT | Finance Copilot |
+| Custom On-Chain Automation | *(A2A task)* | 1.0 USDT | Software Utility |
+| Smart Contract Quick Audit | `/a2mcp/contract-audit` | 0.5 USDT | Software Utility |
+| Multi-Wallet PnL Dashboard | `/a2mcp/wallet-pnl` | 0.3 USDT | Software Utility |
+| Whale Alert Feed | `/a2mcp/whale-alert` | 0.2 USDT | Social Buzz |
+| Bridge Route Optimizer | `/a2mcp/bridge-route` | 0.2 USDT | Software Utility |
+| AI Crypto News Sentiment Alpha | `/a2mcp/news-alpha` | 0.2 USDT | Finance Copilot |
+| Meme Pump Scanner | `/a2mcp/meme-pump` | 0.2 USDT | Finance Copilot |
 
 ## Project layout
 
@@ -22,6 +27,7 @@ okx-ai-agent/
 ├── .env.example
 ├── .gitignore
 ├── README.md
+├── PROMO.md
 ├── requirements.txt
 ├── server.py            # FastAPI A2MCP server
 ├── services.json        # service catalog for ASP registration
@@ -57,7 +63,7 @@ okx-ai-agent/
 
 5. Expose publicly (Cloudflare Tunnel / 9Router) and update `services.json` endpoints.
 
-## Register ASP
+## Register / update ASP
 
 ```bash
 python scripts/register-asp.py
@@ -65,8 +71,10 @@ python scripts/register-asp.py
 
 This calls `onchainos agent create --role asp` using `services.json` and a local avatar image.
 
+To update an existing agent (e.g., #2754), use the `onchainos agent update` flow with a service delta.
+
 ## Notes
 
 - Keep `.env` out of git.
 - Fund the X Layer wallet with a small amount of OKB for gas before activating services.
-- A2MCP endpoint must be publicly reachable over `https://`.
+- A2MCP endpoints must be publicly reachable over `https://`.

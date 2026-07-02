@@ -53,12 +53,17 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Eida OKX.AI A2MCP", lifespan=lifespan)
+app = FastAPI(title="KARA Intelligence OKX.AI A2MCP", lifespan=lifespan)
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "agent": "eida-okx-ai"}
+    return {"ok": True, "agent": "kara-intelligence"}
+
+
+# ---------------------------------------------------------------------------
+# Legacy / general services
+# ---------------------------------------------------------------------------
 
 
 @app.post("/a2mcp/token-report")
@@ -118,7 +123,6 @@ async def rugpull_score(req: Request):
     security = run(["security", "token-scan", "--tokens", f"{chain}:{address}"])
     report = run(["token", "report", "--address", address, "--chain", chain])
 
-    # Simple heuristic score 0-100 (lower = safer)
     score = 0
     reasons = []
     sec_data = None
@@ -182,6 +186,275 @@ async def kara_intel_pack(req: Request):
         "wallet_analysis": run(["workflow", "wallet-analysis", "--address", wallet_address]),
         "security_scan": run(["security", "token-scan", "--tokens", f"{chain}:{token_address}"]),
     }
+
+
+# ---------------------------------------------------------------------------
+# New KARA Intelligence v2 services
+# ---------------------------------------------------------------------------
+
+
+def _audit_token(chain: str, address: str) -> dict[str, Any]:
+    """Shared token audit logic for launch-dd and contract-audit."""
+    report = run(["token", "report", "--address", address, "--chain", chain])
+    security = run(["security", "token-scan", "--tokens", f"{chain}:{address}"])
+
+    score = 0
+    reasons = []
+    verdict = "SAFE"
+    sec_data = None
+    if security.get("ok") and isinstance(security.get("data"), list) and security["data"]:
+        sec_data = security["data"][0]
+    elif security.get("ok") and isinstance(security.get("data"), dict):
+        sec_data = security["data"]
+
+    if not sec_data:
+        score += 30
+        reasons.append("security scan unavailable")
+    else:
+        if sec_data.get("isHoneypot"):
+            score += 50
+            reasons.append("honeypot detected")
+        try:
+            buy_tax = float(sec_data.get("buyTaxes", "0") or "0")
+            sell_tax = float(sec_data.get("sellTaxes", "0") or "0")
+            if buy_tax > 5 or sell_tax > 5:
+                score += 25
+                reasons.append("high tax")
+        except (ValueError, TypeError):
+            pass
+        if sec_data.get("isMintable"):
+            score += 20
+            reasons.append("mintable supply")
+        if sec_data.get("isNotRenounced"):
+            score += 15
+            reasons.append("ownership not renounced")
+
+    if not report.get("ok"):
+        score += 10
+        reasons.append("token report incomplete")
+
+    if score >= 70:
+        verdict = "SCAM"
+    elif score >= 40:
+        verdict = "RISKY"
+    elif score >= 15:
+        verdict = "CAUTION"
+    else:
+        verdict = "SAFE"
+
+    return {
+        "ok": True,
+        "verdict": verdict,
+        "score": min(score, 100),
+        "reasons": reasons,
+        "token_report": report,
+        "security_scan": security,
+    }
+
+
+@app.post("/a2mcp/launch-dd")
+async def launch_dd(req: Request):
+    """Token launch due diligence: security + token report + verdict."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    address = body.get("address", "")
+    if not address:
+        return JSONResponse({"ok": False, "error": "address required"}, status_code=400)
+    return _audit_token(chain, address)
+
+
+@app.post("/a2mcp/contract-audit")
+async def contract_audit(req: Request):
+    """Quick contract audit: same deep check as launch-dd."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    address = body.get("address", "")
+    if not address:
+        return JSONResponse({"ok": False, "error": "address required"}, status_code=400)
+    return _audit_token(chain, address)
+
+
+@app.post("/a2mcp/xlayer-smart-money")
+async def xlayer_smart_money(req: Request):
+    """Top profitable wallets on X Layer."""
+    body = await req.json()
+    time_frame = body.get("time_frame", "7D")
+    sort_by = body.get("sort_by", "PnL")
+    limit = int(body.get("limit", "20"))
+
+    tf_map = {"1D": "1", "3D": "2", "7D": "3", "1M": "4", "3M": "5"}
+    sort_map = {"PnL": "1", "WinRate": "2", "Txs": "3", "Volume": "4", "ROI": "5"}
+
+    tf = tf_map.get(time_frame, "3")
+    sb = sort_map.get(sort_by, "1")
+
+    result = run(
+        ["leaderboard", "list", "--chain", "xlayer", "--time-frame", tf, "--sort-by", sb],
+        timeout=120,
+    )
+    if result.get("ok") and isinstance(result.get("data"), list):
+        result["data"] = result["data"][:limit]
+    return result
+
+
+@app.post("/a2mcp/wallet-cleanup")
+async def wallet_cleanup(req: Request):
+    """Scan wallet for dangerous approvals and risky holdings."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    address = body.get("address", "")
+    if not address:
+        return JSONResponse({"ok": False, "error": "address required"}, status_code=400)
+
+    approvals = run(["security", "approvals", "--address", address, "--chain", chain])
+    holdings = run(["security", "token-scan", "--address", address, "--chain", chain])
+    return {
+        "ok": True,
+        "wallet": address,
+        "chain": chain,
+        "approvals": approvals,
+        "holdings_risk_scan": holdings,
+    }
+
+
+@app.post("/a2mcp/wallet-pnl")
+async def wallet_pnl(req: Request):
+    """Aggregate PnL across multiple wallets."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    addresses = body.get("addresses", "")
+    if not addresses:
+        return JSONResponse({"ok": False, "error": "addresses required"}, status_code=400)
+
+    addrs = [a.strip() for a in str(addresses).split(",") if a.strip()]
+    summaries = []
+    totals = {
+        "realizedPnlUsd": 0.0,
+        "unrealizedPnlUsd": 0.0,
+        "buyTxVolume": 0.0,
+        "sellTxVolume": 0.0,
+        "txs": 0,
+    }
+    for addr in addrs:
+        overview = run(["market", "portfolio-overview", "--chain", chain, "--address", addr])
+        summaries.append({"address": addr, "overview": overview})
+        if overview.get("ok") and isinstance(overview.get("data"), dict):
+            d = overview["data"]
+            for key in totals:
+                try:
+                    totals[key] += float(d.get(key, "0") or "0")
+                except (ValueError, TypeError):
+                    pass
+
+    return {
+        "ok": True,
+        "chain": chain,
+        "wallet_count": len(addrs),
+        "aggregate": totals,
+        "wallets": summaries,
+    }
+
+
+@app.post("/a2mcp/whale-alert")
+async def whale_alert(req: Request):
+    """Latest smart-money / KOL DEX trades on a chain."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    min_volume = str(body.get("min_volume", "1000"))
+    tracker_type = body.get("tracker_type", "smart_money")
+    trade_type = str(body.get("trade_type", "0"))
+
+    tracker_map = {"smart_money": "1", "kol": "2"}
+    tt = tracker_map.get(tracker_type, "1")
+
+    result = run(
+        [
+            "tracker",
+            "activities",
+            "--tracker-type",
+            tt,
+            "--chain",
+            chain,
+            "--min-volume",
+            min_volume,
+            "--trade-type",
+            trade_type,
+        ],
+        timeout=120,
+    )
+    return result
+
+
+@app.post("/a2mcp/bridge-route")
+async def bridge_route(req: Request):
+    """Find cheapest/fastest cross-chain bridge route."""
+    body = await req.json()
+    from_token = body.get("from", "")
+    from_chain = body.get("from_chain", "")
+    to_token = body.get("to", "")
+    to_chain = body.get("to_chain", "")
+    amount = str(body.get("amount", ""))
+    sort = str(body.get("sort", "0"))
+
+    missing = [k for k, v in {
+        "from": from_token,
+        "from_chain": from_chain,
+        "to": to_token,
+        "to_chain": to_chain,
+        "amount": amount,
+    }.items() if not v]
+    if missing:
+        return JSONResponse(
+            {"ok": False, "error": f"missing fields: {', '.join(missing)}"},
+            status_code=400,
+        )
+
+    return run(
+        [
+            "cross-chain",
+            "quote",
+            "--from",
+            from_token,
+            "--from-chain",
+            from_chain,
+            "--to",
+            to_token,
+            "--to-chain",
+            to_chain,
+            "--readable-amount",
+            amount,
+            "--sort",
+            sort,
+        ],
+        timeout=120,
+    )
+
+
+@app.post("/a2mcp/news-alpha")
+async def news_alpha(req: Request):
+    """Crypto news + sentiment for a symbol or topic."""
+    body = await req.json()
+    symbol = body.get("symbol", "BTC")
+    sentiment = run(["social", "sentiment-symbol", "--token-symbols", symbol])
+    news = run(["social", "news-by-symbol", "--token-symbols", symbol])
+    return {
+        "ok": True,
+        "symbol": symbol,
+        "sentiment": sentiment,
+        "news": news,
+    }
+
+
+@app.post("/a2mcp/meme-pump")
+async def meme_pump(req: Request):
+    """Scan newly launched meme tokens with risk filters."""
+    body = await req.json()
+    chain = body.get("chain", "base")
+    stage = body.get("stage", "NEW")
+    result = run(["memepump", "tokens", "--chain", chain, "--stage", stage], timeout=120)
+    if result.get("ok") and isinstance(result.get("data"), list):
+        result["data"] = result["data"][:20]
+    return result
 
 
 if __name__ == "__main__":
