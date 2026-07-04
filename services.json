@@ -2,7 +2,7 @@
   "agent": {
     "role": "asp",
     "name": "KARA Intelligence",
-    "description": "KARA Intelligence delivers on-chain research, security scans, alpha signals, and automation tools for OKX.AI traders and agents. All outputs are for research and informational purposes only and are not financial advice.",
+    "description": "KARA Intelligence offers on-chain research and tooling for OKX.AI users: token launch due diligence, smart contract quick audits, wallet security checks, smart-money and whale tracking, bridge route optimization, crypto news sentiment, and meme/pump scanning. All outputs are for research and informational purposes only and are not financial advice.",
     "picture": "./assets/avatar.png"
   },
   "services": [
