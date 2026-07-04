@@ -2,7 +2,7 @@
   "agent": {
     "role": "asp",
     "name": "KARA Intelligence",
-    "description": "KARA Intelligence is a collective of four specialized AI agents: Zqya (build & audit), Liora (deep research), Riva (on-chain alpha), and Nova (security & execution). We deliver paid research, alpha, security, and automation services for OKX.AI traders and agents.",
+    "description": "KARA Intelligence delivers on-chain research, security scans, alpha signals, and automation tools for OKX.AI traders and agents. All outputs are for research and informational purposes only and are not financial advice.",
     "picture": "./assets/avatar.png"
   },
   "services": [
