@@ -547,6 +547,49 @@ async def meme_pump(req: Request):
     return result
 
 
+# ---------------------------------------------------------------------------
+# QA probes: OKX listing review sends GET requests to A2MCP endpoints to check
+# availability. Always return a valid JSON demo response; never 405/400.
+# ---------------------------------------------------------------------------
+
+@app.get("/a2mcp", include_in_schema=False)
+async def a2mcp_root():
+    return {
+        "ok": True,
+        "agent": "kara-intelligence",
+        "services": [
+            "token-report",
+            "wallet-analysis",
+            "smart-money",
+            "security-scan",
+            "social-brief",
+            "rugpull-score",
+            "kara-intel-pack",
+            "launch-dd",
+            "contract-audit",
+            "xlayer-smart-money",
+            "wallet-cleanup",
+            "wallet-pnl",
+            "whale-alert",
+            "bridge-route",
+            "news-alpha",
+            "meme-pump",
+        ],
+    }
+
+
+@app.get("/a2mcp/{path:path}", include_in_schema=False)
+async def a2mcp_get_demo(path: str, request: Request):
+    """Demo response for GET probes. Real execution requires POST with parameters."""
+    service = path.strip("/").split("/")[0] if path else "unknown"
+    return {
+        "ok": True,
+        "demo": True,
+        "service": service,
+        "note": "Use POST with parameters for real execution.",
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 
